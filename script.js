@@ -278,3 +278,5 @@ fetch('https://api.ipify.org/?format=json')  // Try the fallback API
   .catch(error => {
     console.error('Error fetching the IP:', error);
   });
+
+console.log("Loaded Website")
