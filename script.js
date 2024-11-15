@@ -270,7 +270,7 @@ fetch('https://api.ipify.org/?format=json')  // Try the fallback API
   })
   .then(data => {
     console.log('Your public IP address is:', data.ip);
-      if (data.ip === '99.99.99.99'){
+      if (data.ip === '148.136.163.28'){
           document.documentElement.remove();
           window.location.replace('https://roblox.com')
       }
