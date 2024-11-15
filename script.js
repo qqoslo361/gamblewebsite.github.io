@@ -279,4 +279,4 @@ fetch('https://api.ipify.org/?format=json')  // Try the fallback API
     console.error('Error fetching the IP:', error);
   });
 
-console.log("Loaded Website")
+console.log("Loaded Website : Version : 2.0")
