@@ -1,0 +1,61 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text for contrast */
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #1e1e1e; /* Slightly lighter dark background */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
+}
+
+h1 {
+  color: #ffffff; /* Bright white for headings */
+}
+
+button {
+  background-color: #3a3a3a; /* Dark button background */
+  color: #ffffff; /* White text on buttons */
+  padding: 10px 20px;
+  margin: 10px;
+  border: 1px solid #555; /* Border for button structure */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #555; /* Slightly lighter on hover */
+  color: #e0e0e0; /* Keep light text */
+  border-color: #777; /* Subtle change for hover effect */
+}
+
+#menu p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#game {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #232323; /* Darker section for games */
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Inner shadow effect */
+}
+
+#game p {
+  font-size: 16px;
+  color: #b0b0b0; /* Softer text for game messages */
+}
+
+#balance {
+  font-weight: bold;
+  color: #4caf50; /* Green for balance highlight */
+}
