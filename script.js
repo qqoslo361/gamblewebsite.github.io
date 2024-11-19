@@ -3,14 +3,8 @@ function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
+    return null; // Return null if the cookie doesn't exist
 }
-
-if (getCookie('UsingMedkit')) {
-    console.log("UsingMedkit Exists");
-} else {
-    setCookie('UsingMedkit', 'false', 365); // 365 days, this will last for a year
-}
-
 
 function setCookie(name, value, days) {
     const date = new Date();
@@ -18,56 +12,65 @@ function setCookie(name, value, days) {
     document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
 }
 
+if (getCookie('UsingMedkit')) {
+    console.log("UsingMedkit Exists");
+} else {
+    setCookie('UsingMedkit', 'false', 365); // Default to false if it doesn't exist
+}
+
 let balance = parseInt(getCookie("balance")) || 100; // Default balance: 100 coins
-document.getElementById('balance').textContent = balance;
+document.getElementById('balance').textContent = formatBalanceDisplay(balance);
 
 function getInventory() {
     const inventory = getCookie('inventory');
     return inventory ? JSON.parse(inventory) : {}; // Return parsed object or empty object if none found
 }
 
-// Function to save the inventory to the cookie
 function setInventory(inventory) {
     setCookie('inventory', JSON.stringify(inventory), 7); // Save as a JSON string for 7 days
 }
 
-// Function to add an item to the inventory (example: 'Medkit')
 function addItemToInventory(item) {
-    let inventory = getInventory(); // Get current inventory
-
-    // If the item already exists, increase the quantity, otherwise add it with quantity 1
+    let inventory = getInventory();
     if (inventory[item]) {
         inventory[item]++;
     } else {
         inventory[item] = 1;
     }
-
-    setInventory(inventory); // Save updated inventory to cookie
+    setInventory(inventory);
 }
 
-// Function to remove an item from the inventory
 function removeItemFromInventory(item) {
     let inventory = getInventory();
-
-    // If the item exists, decrease quantity or delete it
     if (inventory[item]) {
         inventory[item]--;
         if (inventory[item] <= 0) {
             delete inventory[item];
         }
     }
-
-    setInventory(inventory); // Save updated inventory to cookie
+    setInventory(inventory);
 }
 
-// Update cookie and balance display
+function formatBalanceDisplay(balance) {
+    if (balance >= 1e12) {
+        return (balance / 1e12).toFixed(1) + 'T'; // Trillions
+    } else if (balance >= 1e9) {
+        return (balance / 1e9).toFixed(1) + 'B'; // Billions
+    } else if (balance >= 1e6) {
+        return (balance / 1e6).toFixed(1) + 'M'; // Millions
+    } else if (balance >= 1e3) {
+        return (balance / 1e3).toFixed(1) + 'K'; // Thousands
+    } else {
+        return balance; // Less than 1,000
+    }
+}
+
 function updateBalance(amount) {
     balance += amount;
-    setCookie("balance", balance, 7); // Store balance for 7 days
-    document.getElementById('balance').textContent = balance;
+    setCookie("balance", balance, 7);
+    document.getElementById('balance').textContent = formatBalanceDisplay(balance);
 }
 
-// Coin Flip Game
 function coinFlip() {
     const gameDiv = document.getElementById('game');
     gameDiv.innerHTML = `
@@ -91,17 +94,17 @@ function playCoinFlip(choice) {
         updateBalance(40); // Win 40 coins
         gameDiv.innerHTML = `<p>You chose ${choice}. The result was ${result}. You won 40 coins!</p>`;
     } else {
-        updateBalance(-20); // Lose 10 coins
-        gameDiv.innerHTML = `<p>You chose ${choice}. The result was ${result}. You lost 20 coins!</p>`;
+        updateBalance(-10); // Lose 10 coins
+        gameDiv.innerHTML = `<p>You chose ${choice}. The result was ${result}. You lost 10 coins!</p>`;
     }
 
     gameDiv.innerHTML += `<button onclick="coinFlip()">Play Again</button>`;
 }
 
-function Roulette(){
+function Roulette() {
     const gameDiv = document.getElementById('game');
     gameDiv.innerHTML = `
-        <p>Choose a number of times to shoot yourself (Bet all  your coins)</p>
+        <p>Choose a number of times to shoot yourself (Bet all your coins)</p>
         <button onclick="PlayRoulette(1)">Shoot once</button>
         <button onclick="PlayRoulette(2)">Shoot twice</button>
         <button onclick="PlayRoulette(3)">Shoot thrice</button>
@@ -111,28 +114,43 @@ function Roulette(){
     `;
 }
 
-
 function PlayRoulette(numb) {
-    let liveRound = Math.floor(Math.random() * 6) + 1;
-    let wintyplier = ((liveRound - numb) * (0 - 1)) + 6;
+    if (numb > 6){
+      return death('cheat')
+    } else if (numb <= 0){
+      return death('cheat')
+    }
+    const liveRound = Math.floor(Math.random() * 6) + 1;
+    const wintyplier = liveRound > numb ? (liveRound - numb) : 0;
+    if (numb === 1){
+      wintyplier = 1.2
+    } else if (numb === 2){
+      wintyplier = 1.4
+    } else if (numb === 3){
+      wintyplier = 1.6
+    } else if (numb === 4){
+      wintyplier = 1.8
+    } else if (numb === 5){
+      wintyplier = 2
+    } else if (numb === 6){
+      wintyplier = 2.2
+    }
     if (liveRound <= numb) {
         if (getCookie('UsingMedkit') === 'true') {
-            mathchancemed = Math.random()
-            console.log(mathchancemed)
-            if (mathchancemed <= 0.75){
+            if (Math.random() <= 0.75) {
                 setCookie('UsingMedkit', 'false', 365);
                 unequipItem('Medkit');
                 removeItemFromInventory('Medkit');
-                console.log("Medkit Worked Gone");
+                console.log("Medkit worked, you survived.");
+                alert("You almost died. Medkit saved you..")
                 updateBalance(balance * wintyplier);
-                
             } else {
                 death();
-                print("Medkit Failed Death")
+                console.log("Medkit failed, you died.");
             }
         } else {
             death();
-            print("Skill issue")
+            console.log("No Medkit equipped, you died.");
         }
     } else {
         updateBalance(balance * wintyplier);
@@ -140,14 +158,13 @@ function PlayRoulette(numb) {
     }
 }
 
-
-function death(){
-    updateBalance(-balance)
-    setCookie('inventory', "", 365)
-    setCookie('UsingMedkit', false, 365)
-    setCookie('equippedItem', "", 365)
-    updateBalance(10)
-    alert("you were shot and it cost you almost all of your money to get medical help (the company took the rest)")
+function death() {
+    updateBalance(-balance);
+    setCookie('inventory', "", 365);
+    setCookie('UsingMedkit', 'false', 365);
+    setCookie('equippedItem', "", 365);
+    updateBalance(10); // Restart with minimal balance
+    alert("You were shot! Almost all your money was spent on medical help.");
 }
 
 function lottery(){
@@ -261,22 +278,4 @@ function unequipItem() {
     Inventory(); // Refresh the inventory to show that no item is equipped
 }
 
-fetch('https://api.ipify.org/?format=json')  // Try the fallback API
-  .then(response => {
-    if (!response.ok) {  // If response status is not OK, throw an error
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Your public IP address is:', data.ip);
-      if (data.ip === '99.99.99.99'){
-          document.documentElement.remove();
-          window.location.replace('https://www.snapchat.com/')
-      }
-  })
-  .catch(error => {
-    console.error('Error fetching the IP:', error);
-  });
-
-console.log("Loaded Website : Version : 2.0")
+console.log("Loaded Website : Version : 3.0")
