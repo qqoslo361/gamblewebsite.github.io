@@ -53,19 +53,24 @@ function removeItemFromInventory(item) {
 
 function formatBalanceDisplay(balance) {
     if (balance >= 1e12) {
-        return (balance / 1e12).toFixed(1) + 'T'; // Trillions
+        return parseFloat((balance / 1e12).toFixed(2)) + 'T'; // Trillions
     } else if (balance >= 1e9) {
-        return (balance / 1e9).toFixed(1) + 'B'; // Billions
+        return parseFloat((balance / 1e9).toFixed(2)) + 'B'; // Billions
     } else if (balance >= 1e6) {
-        return (balance / 1e6).toFixed(1) + 'M'; // Millions
+        return parseFloat((balance / 1e6).toFixed(2)) + 'M'; // Millions
     } else if (balance >= 1e3) {
-        return (balance / 1e3).toFixed(1) + 'K'; // Thousands
+        return parseFloat((balance / 1e3).toFixed(2)) + 'K'; // Thousands
     } else {
-        return balance; // Less than 1,000
+        return parseFloat(balance.toFixed(2)); // Less than 1,000
     }
 }
 
+
 function updateBalance(amount) {
+    if (amount >= Number.POSITIVE_INFINITY){
+      alert("Bro set is balance to infinity crash nvm you get negative infinity")
+      amount = Number.NEGATIVE_INFINITY
+    }
     balance += amount;
     setCookie("balance", balance, 7);
     document.getElementById('balance').textContent = formatBalanceDisplay(balance);
@@ -115,26 +120,25 @@ function Roulette() {
 }
 
 function PlayRoulette(numb) {
-    if (numb > 6){
-      return death('cheat')
-    } else if (numb <= 0){
-      return death('cheat')
+    if (numb > 6 || numb <= 0) {
+        return death('cheat');
     }
+
     const liveRound = Math.floor(Math.random() * 6) + 1;
-    const wintyplier = liveRound > numb ? (liveRound - numb) : 0;
-    if (numb === 1){
-      wintyplier = 1.2
-    } else if (numb === 2){
-      wintyplier = 1.4
-    } else if (numb === 3){
-      wintyplier = 1.6
-    } else if (numb === 4){
-      wintyplier = 1.8
-    } else if (numb === 5){
-      wintyplier = 2
-    } else if (numb === 6){
-      wintyplier = 2.2
-    }
+    let wintyplier = 0;
+
+    // Assigning win multiplier based on `numb` value
+    const multipliers = {
+        1: 1.2,
+        2: 1.4,
+        3: 1.6,
+        4: 1.8,
+        5: 2,
+        6: 2.2
+    };
+
+    wintyplier = multipliers[numb] || 0;
+
     if (liveRound <= numb) {
         if (getCookie('UsingMedkit') === 'true') {
             if (Math.random() <= 0.75) {
@@ -142,7 +146,7 @@ function PlayRoulette(numb) {
                 unequipItem('Medkit');
                 removeItemFromInventory('Medkit');
                 console.log("Medkit worked, you survived.");
-                alert("You almost died. Medkit saved you..")
+                alert("You almost died. Medkit saved you.");
                 updateBalance(balance * wintyplier);
             } else {
                 death();
@@ -163,7 +167,7 @@ function death() {
     setCookie('inventory', "", 365);
     setCookie('UsingMedkit', 'false', 365);
     setCookie('equippedItem', "", 365);
-    updateBalance(10); // Restart with minimal balance
+    updateBalance(25); // Restart with minimal balance
     alert("You were shot! Almost all your money was spent on medical help.");
 }
 
@@ -278,4 +282,4 @@ function unequipItem() {
     Inventory(); // Refresh the inventory to show that no item is equipped
 }
 
-console.log("Loaded Website : Version : 3.0")
+console.log("Loaded Website : Version : 3.1")
